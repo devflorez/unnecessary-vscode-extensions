@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Encouragement">
+  <rect width="640" height="360" fill="#CFE8FF"/>
+  <g transform="translate(320 180)">
+    <circle r="110" fill="#2D7FF9"/>
+    <circle cx="-35" cy="-25" r="12" fill="#ffffff"/>
+    <circle cx="35" cy="-25" r="12" fill="#ffffff"/>
+    <path d="M -50 20 Q 0 70 50 20" fill="none" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+  </g>
+</svg>

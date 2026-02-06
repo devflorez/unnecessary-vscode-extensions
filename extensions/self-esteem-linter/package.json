@@ -1,0 +1,142 @@
+{
+  "name": "self-esteem-linter",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.109.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "selfEsteemLinter",
+          "title": "%view.container.title%",
+          "icon": "media/sidebar.svg"
+        }
+      ]
+    },
+    "views": {
+      "selfEsteemLinter": [
+        {
+          "id": "selfEsteemLinter.mediaView",
+          "name": "%view.media.title%",
+          "type": "webview",
+          "icon": "media/sidebar.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "self-esteem-linter.toggleEnabled",
+        "title": "%command.toggleEnabled%"
+      },
+      {
+        "command": "self-esteem-linter.resetStreak",
+        "title": "%command.resetStreak%"
+      },
+      {
+        "command": "self-esteem-linter.showStatus",
+        "title": "%command.showStatus%"
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "selfEsteemLinter.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.enabled.description%"
+        },
+        "selfEsteemLinter.streakThreshold1": {
+          "type": "number",
+          "default": 3,
+          "description": "%configuration.streakThreshold1.description%"
+        },
+        "selfEsteemLinter.streakThreshold2": {
+          "type": "number",
+          "default": 5,
+          "description": "%configuration.streakThreshold2.description%"
+        },
+        "selfEsteemLinter.cooldownSeconds": {
+          "type": "number",
+          "default": 10,
+          "description": "%configuration.cooldownSeconds.description%"
+        },
+        "selfEsteemLinter.celebrateOnRecovery": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.celebrateOnRecovery.description%"
+        },
+        "selfEsteemLinter.showMedia": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.showMedia.description%"
+        },
+        "selfEsteemLinter.focusMode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.focusMode.enabled.description%"
+        },
+        "selfEsteemLinter.focusMode.intervalMinutes": {
+          "type": "number",
+          "default": 5,
+          "description": "%configuration.focusMode.intervalMinutes.description%"
+        },
+        "selfEsteemLinter.soundOnRecovery": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.soundOnRecovery.description%"
+        },
+        "selfEsteemLinter.messages.threshold1": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.messages.threshold1.description%"
+        },
+        "selfEsteemLinter.messages.threshold2": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.messages.threshold2.description%"
+        },
+        "selfEsteemLinter.messages.recovery": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.messages.recovery.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.109.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.54.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Encouragement">
+  <rect width="640" height="360" fill="#F8E08E"/>
+  <g transform="translate(320 180)">
+    <polygon points="0,-120 120,100 -120,100" fill="#F39C12"/>
+    <rect x="-14" y="-40" width="28" height="70" rx="10" fill="#ffffff"/>
+    <circle cx="0" cy="60" r="14" fill="#ffffff"/>
+  </g>
+</svg>

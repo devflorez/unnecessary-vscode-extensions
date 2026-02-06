@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Encouragement">
+  <rect width="640" height="360" fill="#D7F5D3"/>
+  <g transform="translate(320 180)">
+    <circle r="110" fill="#2EAD52"/>
+    <path d="M -55 10 L -10 55 L 70 -25" fill="none" stroke="#ffffff" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

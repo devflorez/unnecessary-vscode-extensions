@@ -1,0 +1,22 @@
+{
+  "extension.displayName": "Self Esteem Linter",
+  "extension.description": "Emotional support for developers when their code fails.",
+  "view.container.title": "Self Esteem",
+  "view.media.title": "Encouragement",
+  "command.toggleEnabled": "Self Esteem Linter: Toggle Enabled",
+  "command.resetStreak": "Self Esteem Linter: Reset Streak",
+  "command.showStatus": "Self Esteem Linter: Show Status",
+  "configuration.title": "Self Esteem Linter",
+  "configuration.enabled.description": "Enable or disable Self Esteem Linter.",
+  "configuration.streakThreshold1.description": "First streak threshold for a supportive warning message.",
+  "configuration.streakThreshold2.description": "Second streak threshold for a supportive info message.",
+  "configuration.cooldownSeconds.description": "Minimum seconds between any two messages.",
+  "configuration.celebrateOnRecovery.description": "Show a celebration message when errors drop to zero after a streak.",
+  "configuration.showMedia.description": "Show a button that opens the encouragement view in the sidebar.",
+  "configuration.focusMode.enabled.description": "Reduce notifications by enforcing a minimum interval between messages.",
+  "configuration.focusMode.intervalMinutes.description": "Minimum minutes between messages while Focus Mode is enabled.",
+  "configuration.soundOnRecovery.description": "Play a soft sound when recovering (requires sidebar view opened at least once).",
+  "configuration.messages.threshold1.description": "Custom message for the first threshold. Use {streak} and {file}. Leave blank for default.",
+  "configuration.messages.threshold2.description": "Custom message for the second threshold. Use {streak} and {file}. Leave blank for default.",
+  "configuration.messages.recovery.description": "Custom message for recovery. Use {streak} and {file}. Leave blank for default."
+}

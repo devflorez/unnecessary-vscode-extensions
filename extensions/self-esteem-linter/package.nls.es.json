@@ -1,0 +1,22 @@
+{
+  "extension.displayName": "Self Esteem Linter",
+  "extension.description": "Apoyo emocional para desarrolladores cuando su codigo falla.",
+  "view.container.title": "Self Esteem",
+  "view.media.title": "Apoyo",
+  "command.toggleEnabled": "Self Esteem Linter: Alternar activado",
+  "command.resetStreak": "Self Esteem Linter: Reiniciar racha",
+  "command.showStatus": "Self Esteem Linter: Mostrar estado",
+  "configuration.title": "Self Esteem Linter",
+  "configuration.enabled.description": "Habilita o deshabilita Self Esteem Linter.",
+  "configuration.streakThreshold1.description": "Primer umbral de racha para un mensaje de apoyo (advertencia).",
+  "configuration.streakThreshold2.description": "Segundo umbral de racha para un mensaje de apoyo (informativo).",
+  "configuration.cooldownSeconds.description": "Segundos minimos entre dos mensajes.",
+  "configuration.celebrateOnRecovery.description": "Muestra una celebracion cuando los errores bajan a cero tras una racha.",
+  "configuration.showMedia.description": "Muestra un boton que abre la vista de apoyo en la barra lateral.",
+  "configuration.focusMode.enabled.description": "Reduce notificaciones forzando un intervalo minimo entre mensajes.",
+  "configuration.focusMode.intervalMinutes.description": "Minutos minimos entre mensajes cuando el modo Focus esta activo.",
+  "configuration.soundOnRecovery.description": "Reproduce un sonido suave al recuperarse (requiere abrir la vista lateral al menos una vez).",
+  "configuration.messages.threshold1.description": "Mensaje personalizado para el primer umbral. Usa {streak} y {file}. En blanco usa el default.",
+  "configuration.messages.threshold2.description": "Mensaje personalizado para el segundo umbral. Usa {streak} y {file}. En blanco usa el default.",
+  "configuration.messages.recovery.description": "Mensaje personalizado para recuperacion. Usa {streak} y {file}. En blanco usa el default."
+}
