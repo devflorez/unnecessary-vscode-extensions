@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   publish:
+    environment: PROD
     runs-on: ubuntu-latest
     defaults:
       run:
