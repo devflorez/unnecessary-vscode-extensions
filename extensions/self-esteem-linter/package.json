@@ -9,7 +9,7 @@
     "url": "https://github.com/devflorez/unnecessary-vscode-extension.git",
     "directory": "extensions/self-esteem-linter"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.109.0"
   },
