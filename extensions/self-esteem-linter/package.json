@@ -1,5 +1,6 @@
 {
   "name": "self-esteem-linter",
+  "publisher": "devflorez",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
   "version": "0.0.1",
