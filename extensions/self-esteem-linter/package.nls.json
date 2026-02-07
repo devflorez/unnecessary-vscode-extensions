@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Self Esteem Linter",
-  "extension.description": "Emotional support for developers when their code fails.",
+  "extension.description": "Supportive linter that cheers you on when errors pile up.",
   "view.container.title": "Self Esteem",
   "view.media.title": "Encouragement",
   "command.toggleEnabled": "Self Esteem Linter: Toggle Enabled",

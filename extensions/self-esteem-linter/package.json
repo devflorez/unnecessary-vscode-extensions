@@ -3,18 +3,27 @@
   "publisher": "devflorez",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
+  "icon": "media/icon.png",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/devflorez/unnecessary-vscode-extension.git",
     "directory": "extensions/self-esteem-linter"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "linter",
+    "self-esteem",
+    "motivation",
+    "productivity",
+    "diagnostics",
+    "developer"
   ],
   "activationEvents": [
     "onStartupFinished"

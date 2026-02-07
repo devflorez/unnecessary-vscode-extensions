@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Self Esteem Linter",
-  "extension.description": "Apoyo emocional para desarrolladores cuando su codigo falla.",
+  "extension.description": "Linter motivacional que te anima cuando se acumulan errores.",
   "view.container.title": "Self Esteem",
   "view.media.title": "Apoyo",
   "command.toggleEnabled": "Self Esteem Linter: Alternar activado",
