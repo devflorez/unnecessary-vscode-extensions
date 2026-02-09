@@ -1,0 +1,11 @@
+{
+  "Git extension not available.": "La extensión de Git no está disponible.",
+  "No Git repository found.": "No se encontró un repositorio Git.",
+  "No commit message found in the Source Control input box.": "No se encontró un mensaje de commit en el cuadro de Source Control.",
+  "Choose a commit mood": "Elige un mood para el commit",
+  "Commit message translated to {0}.": "Mensaje de commit traducido a {0}.",
+  "OpenAI API key is missing. Using local translation.": "Falta la API key de OpenAI. Se usa la traducción local.",
+  "OpenAI request failed. Using local translation.": "Falló la llamada a OpenAI. Se usa la traducción local.",
+  "Enter OpenAI API key": "Ingresa la API key de OpenAI",
+  "OpenAI API key saved.": "API key de OpenAI guardada."
+}

@@ -1,0 +1,18 @@
+{
+  "extension.displayName": "Commit Mood Translator",
+  "extension.description": "Traduce tu mensaje de commit a estados de ánimo expresivos",
+  "command.translateCommit": "Commit Mood Translator: Traducir commit",
+  "command.setOpenAIKey": "Commit Mood Translator: Guardar API Key de OpenAI",
+  "configuration.title": "Commit Mood Translator",
+  "configuration.moods.description": "Moods personalizados con plantillas. Si está vacío, se usan los valores por defecto.",
+  "configuration.moods.item.label": "Etiqueta del mood que se muestra en la lista.",
+  "configuration.moods.item.template": "Plantilla con el marcador {message}. Ejemplo: [Chill] {message}",
+  "configuration.moods.item.description": "Descripción opcional que se muestra en la lista.",
+  "configuration.openAI.enabled.description": "Habilitar reescritura con OpenAI.",
+  "configuration.openAI.apiKey.description": "API key opcional. Es mejor guardarla con el comando.",
+  "configuration.openAI.model.description": "Modelo de OpenAI a usar para reescribir.",
+  "configuration.openAI.promptTemplate.description": "Plantilla del prompt. Usa {message} y {mood}.",
+  "configuration.openAI.systemPrompt.description": "Instrucciones del sistema para el asistente.",
+  "configuration.openAI.maxTokens.description": "Máximo de tokens para la respuesta.",
+  "configuration.openAI.temperature.description": "Temperatura de muestreo para creatividad."
+}

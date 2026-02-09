@@ -1,0 +1,155 @@
+{
+  "name": "commit-mood-translator",
+  "publisher": "devflorez",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "icon": "media/commit-mood-translator-icon.png",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Other"
+  ],
+  "keywords": [
+    "git",
+    "commit",
+    "mood",
+    "source control",
+    "productivity"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions"
+  },
+  "bugs": {
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions/issues"
+  },
+  "homepage": "https://github.com/devflorez/unnecessary-vscode-extensions#readme",
+  "activationEvents": [
+    "onCommand:commit-mood-translator.translateCommit",
+    "onCommand:commit-mood-translator.setOpenAIKey"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "commit-mood-translator.translateCommit",
+        "title": "%command.translateCommit%",
+        "icon": "media/commit-mood-icon.png"
+      },
+      {
+        "command": "commit-mood-translator.setOpenAIKey",
+        "title": "%command.setOpenAIKey%"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "commit-mood-translator.translateCommit",
+          "group": "navigation@50"
+        }
+      ],
+      "scm/sourceControl": [
+        {
+          "command": "commit-mood-translator.translateCommit",
+          "group": "inline@50"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "commitMoodTranslator.moods": {
+          "type": "array",
+          "default": [],
+          "description": "%configuration.moods.description%",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": "%configuration.moods.item.label%"
+              },
+              "template": {
+                "type": "string",
+                "description": "%configuration.moods.item.template%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%configuration.moods.item.description%"
+              }
+            },
+            "required": [
+              "label",
+              "template"
+            ]
+          }
+        },
+        "commitMoodTranslator.openAI.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.openAI.enabled.description%"
+        },
+        "commitMoodTranslator.openAI.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.openAI.apiKey.description%"
+        },
+        "commitMoodTranslator.openAI.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "%configuration.openAI.model.description%"
+        },
+        "commitMoodTranslator.openAI.promptTemplate": {
+          "type": "string",
+          "default": "Rewrite this git commit message in a {mood} tone. Keep it short, imperative, single line. Include a mood tag and emoji. Original: {message}",
+          "description": "%configuration.openAI.promptTemplate.description%"
+        },
+        "commitMoodTranslator.openAI.systemPrompt": {
+          "type": "string",
+          "default": "You rewrite git commit messages. Return only the final commit message, no extra text.",
+          "description": "%configuration.openAI.systemPrompt.description%"
+        },
+        "commitMoodTranslator.openAI.maxTokens": {
+          "type": "number",
+          "default": 60,
+          "description": "%configuration.openAI.maxTokens.description%"
+        },
+        "commitMoodTranslator.openAI.temperature": {
+          "type": "number",
+          "default": 0.4,
+          "description": "%configuration.openAI.temperature.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.54.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
