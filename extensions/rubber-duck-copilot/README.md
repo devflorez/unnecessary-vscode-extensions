@@ -12,7 +12,7 @@ Rubber Duck Copilot is a playful debugging companion. When you save a file or hi
 ## Development
 From the repo root:
 ```bash
-cd /Users/cristiandavidflorez/Documents/TRABAJO/DEVFLOREZ/unnecessary-vscode-extensions/extensions/rubber-duck-copilot
+cd extensions/rubber-duck-copilot
 npm install
 npm run watch
 ```

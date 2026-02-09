@@ -50,7 +50,7 @@ Example overrides:
 ## Development
 From the repo root:
 ```bash
-cd /Users/cristiandavidflorez/Documents/TRABAJO/DEVFLOREZ/unnecessary-vscode-extensions/extensions/eol-guardian
+cd extensions/eol-guardian
 npm install
 npm run watch
 ```
