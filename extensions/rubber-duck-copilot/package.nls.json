@@ -1,0 +1,18 @@
+{
+  "extension.displayName": "Rubber Duck Copilot",
+  "extension.description": "Playful rubber duck debugging prompts to help you think out loud.",
+  "view.container.title": "Rubber Duck",
+  "view.panel.title": "Duck Panel",
+  "command.toggleEnabled": "Rubber Duck Copilot: Toggle Enabled",
+  "command.newPrompt": "Rubber Duck Copilot: New Prompt",
+  "command.openDuckPanel": "Rubber Duck Copilot: Open Duck Panel",
+  "command.mute": "Rubber Duck Copilot: Mute 10 Minutes",
+  "command.resetSessionCount": "Rubber Duck Copilot: Reset Session Count",
+  "configuration.title": "Rubber Duck Copilot",
+  "configuration.enabled.description": "Enable or disable Rubber Duck Copilot.",
+  "configuration.triggerOnSave.description": "Show prompts when files are saved.",
+  "configuration.triggerOnErrors.description": "Show prompts when the active file has errors.",
+  "configuration.cooldownSeconds.description": "Minimum seconds between prompts.",
+  "configuration.maxPromptsPerSession.description": "Maximum prompts per VS Code session.",
+  "configuration.muteMinutesDefault.description": "Default mute duration in minutes."
+}

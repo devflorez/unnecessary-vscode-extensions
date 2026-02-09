@@ -1,0 +1,15 @@
+{
+  "Duck: ON": "Duck: ON",
+  "Duck: OFF": "Duck: OFF",
+  "Open Duck Panel": "Open Duck Panel",
+  "Duck is muted for now.": "Duck is muted for now.",
+  "Duck session limit reached.": "Duck session limit reached.",
+  "No prompt yet.": "No prompt yet.",
+  "Not muted": "Not muted",
+  "Muted until {0}": "Muted until {0}",
+  "Session: {0}/{1}": "Session: {0}/{1}",
+  "New prompt": "New prompt",
+  "Copy prompt": "Copy prompt",
+  "Mute 10 min": "Mute 10 min",
+  "Rubber Duck Copilot": "Rubber Duck Copilot"
+}

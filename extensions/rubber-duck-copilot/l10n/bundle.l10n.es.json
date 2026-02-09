@@ -1,0 +1,15 @@
+{
+  "Duck: ON": "Pato: ON",
+  "Duck: OFF": "Pato: OFF",
+  "Open Duck Panel": "Abrir panel del pato",
+  "Duck is muted for now.": "El pato está en silencio por ahora.",
+  "Duck session limit reached.": "Se alcanzó el límite de mensajes de la sesión.",
+  "No prompt yet.": "Aún no hay mensaje.",
+  "Not muted": "Sin silencio",
+  "Muted until {0}": "En silencio hasta {0}",
+  "Session: {0}/{1}": "Sesión: {0}/{1}",
+  "New prompt": "Nuevo mensaje",
+  "Copy prompt": "Copiar mensaje",
+  "Mute 10 min": "Silenciar 10 min",
+  "Rubber Duck Copilot": "Rubber Duck Copilot"
+}

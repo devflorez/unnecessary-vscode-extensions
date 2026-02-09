@@ -1,0 +1,18 @@
+{
+  "extension.displayName": "Rubber Duck Copilot",
+  "extension.description": "Mensajes de pato de goma para ayudarte a pensar en voz alta.",
+  "view.container.title": "Pato de Goma",
+  "view.panel.title": "Panel del Pato",
+  "command.toggleEnabled": "Rubber Duck Copilot: Alternar activado",
+  "command.newPrompt": "Rubber Duck Copilot: Nuevo mensaje",
+  "command.openDuckPanel": "Rubber Duck Copilot: Abrir panel del pato",
+  "command.mute": "Rubber Duck Copilot: Silenciar 10 minutos",
+  "command.resetSessionCount": "Rubber Duck Copilot: Reiniciar contador de sesión",
+  "configuration.title": "Rubber Duck Copilot",
+  "configuration.enabled.description": "Habilita o deshabilita Rubber Duck Copilot.",
+  "configuration.triggerOnSave.description": "Mostrar mensajes al guardar archivos.",
+  "configuration.triggerOnErrors.description": "Mostrar mensajes cuando el archivo activo tenga errores.",
+  "configuration.cooldownSeconds.description": "Segundos mínimos entre mensajes.",
+  "configuration.maxPromptsPerSession.description": "Máximo de mensajes por sesión de VS Code.",
+  "configuration.muteMinutesDefault.description": "Duración por defecto del silencio en minutos."
+}

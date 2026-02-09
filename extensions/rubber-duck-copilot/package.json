@@ -1,0 +1,140 @@
+{
+  "name": "rubber-duck-copilot",
+  "publisher": "devflorez",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "icon": "media/duck-icon.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions"
+  },
+  "bugs": {
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions/issues"
+  },
+  "homepage": "https://github.com/devflorez/unnecessary-vscode-extensions#readme",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Other"
+  ],
+  "keywords": [
+    "rubber-duck",
+    "debugging",
+    "productivity",
+    "prompts",
+    "copilot",
+    "assistant"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rubberDuckCopilot",
+          "title": "%view.container.title%",
+          "icon": "media/duck-sidebar.png"
+        }
+      ]
+    },
+    "views": {
+      "rubberDuckCopilot": [
+        {
+          "id": "rubberDuckCopilot.panel",
+          "name": "%view.panel.title%",
+          "type": "webview",
+          "icon": "media/duck-sidebar.png"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "rubber-duck-copilot.toggleEnabled",
+        "title": "%command.toggleEnabled%"
+      },
+      {
+        "command": "rubber-duck-copilot.newPrompt",
+        "title": "%command.newPrompt%"
+      },
+      {
+        "command": "rubber-duck-copilot.openDuckPanel",
+        "title": "%command.openDuckPanel%"
+      },
+      {
+        "command": "rubber-duck-copilot.mute",
+        "title": "%command.mute%"
+      },
+      {
+        "command": "rubber-duck-copilot.resetSessionCount",
+        "title": "%command.resetSessionCount%"
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "rubberDuckCopilot.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.enabled.description%"
+        },
+        "rubberDuckCopilot.triggerOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.triggerOnSave.description%"
+        },
+        "rubberDuckCopilot.triggerOnErrors": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.triggerOnErrors.description%"
+        },
+        "rubberDuckCopilot.cooldownSeconds": {
+          "type": "number",
+          "default": 30,
+          "description": "%configuration.cooldownSeconds.description%"
+        },
+        "rubberDuckCopilot.maxPromptsPerSession": {
+          "type": "number",
+          "default": 5,
+          "description": "%configuration.maxPromptsPerSession.description%"
+        },
+        "rubberDuckCopilot.muteMinutesDefault": {
+          "type": "number",
+          "default": 10,
+          "description": "%configuration.muteMinutesDefault.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.54.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

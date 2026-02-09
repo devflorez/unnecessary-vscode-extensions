@@ -13,11 +13,13 @@ This repository is built in public to:
 | Name | Description | Status |
 |-----|------------|--------|
 | Self Esteem Linter | Encouraging messages when your code breaks | ✅ Ready |
+| Rubber Duck Copilot | Thoughtful rubber duck questions when you save or hit errors | ✅ Ready |
 
 ## Structure
 ```text
 extensions/
   ├── self-esteem-linter/
+  ├── rubber-duck-copilot/
 ```
 
 ## Publishing (Self Esteem Linter)
