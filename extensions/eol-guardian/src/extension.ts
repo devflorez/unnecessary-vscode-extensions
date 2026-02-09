@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 
 import {
@@ -6,14 +7,21 @@ import {
 	mapEolEnum,
 	resolveExpectedEol,
 } from './core/eolCore';
+import { matchGlob, normalizePath } from './core/glob';
 import { findEditorConfigEol } from './editorconfig';
 
 const COMMAND_FIX = 'eol-guardian.fixCurrentFileEol';
 const COMMAND_SHOW = 'eol-guardian.showCurrentFileEol';
 const COMMAND_TOGGLE = 'eol-guardian.toggleEnabled';
+const COMMAND_FIX_WORKSPACE = 'eol-guardian.fixWorkspaceEol';
+const COMMAND_SET_MODE = 'eol-guardian.setMode';
 
 const CONVERT_ACTION = 'Convert';
 const IGNORE_ACTION = 'Ignore';
+
+const DEFAULT_EXCLUDE = '**/{node_modules,.git,dist,build,out}/**';
+
+let sessionFixes = 0;
 
 type Config = {
 	enabled: boolean;
@@ -23,6 +31,15 @@ type Config = {
 	mode: 'detectOnly' | 'askBeforeFix' | 'fixOnSave';
 	cooldownSeconds: number;
 	respectEditorConfig: boolean;
+	overrides: OverrideConfig[];
+	ignore: string[];
+};
+
+type OverrideConfig = {
+	languageId?: string;
+	pattern?: string;
+	eol: 'lf' | 'crlf';
+	description?: string;
 };
 
 type FileState = {
@@ -33,6 +50,28 @@ type FileState = {
 
 type ConversionResult = {
 	status: 'changed' | 'unchanged' | 'failed';
+};
+
+type ExpectedEolInfo = {
+	expected: 'lf' | 'crlf' | 'auto';
+	source: 'editorconfig' | 'override' | 'settings' | 'auto';
+	sourcePath?: string;
+	sourceDetail?: string;
+};
+
+type StatusBarState = {
+	text: string;
+	tooltip?: vscode.MarkdownString | string;
+};
+
+type DecisionContext = {
+	document: vscode.TextDocument;
+	expectedEol: 'lf' | 'crlf';
+	decision: ReturnType<typeof decideAction>;
+	currentLabel: string;
+	expectedLabel: string;
+	key: string;
+	state: FileState;
 };
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -59,7 +98,13 @@ export function activate(context: vscode.ExtensionContext): void {
 		if (config.mode === 'fixOnSave' && reason !== 'save') {
 			return false;
 		}
-		return isTextDocument(document);
+		if (!isTextDocument(document)) {
+			return false;
+		}
+		if (isIgnored(document, config)) {
+			return false;
+		}
+		return true;
 	};
 
 	const showMismatchWarning = async (current: string, expected: string): Promise<void> => {
@@ -85,23 +130,35 @@ export function activate(context: vscode.ExtensionContext): void {
 		return 'dismiss';
 	};
 
+	const applyDecision = async (context: DecisionContext, states: Map<string, FileState>): Promise<void> => {
+		if (context.decision.action === 'warn') {
+			await showMismatchWarning(context.currentLabel, context.expectedLabel);
+			return;
+		}
+
+		if (context.decision.action === 'prompt') {
+			const choice = await promptToFix(context.currentLabel, context.expectedLabel);
+			if (choice === 'convert') {
+				const result = await convertDocumentEol(context.document, context.expectedEol);
+				await showConversionMessage(context.expectedEol, result.status);
+				return;
+			}
+			if (choice === 'ignore') {
+				states.set(context.key, { ...context.state, ignored: true });
+			}
+			return;
+		}
+
+		if (context.decision.action === 'fix') {
+			const result = await convertDocumentEol(context.document, context.expectedEol);
+			await showConversionMessage(context.expectedEol, result.status);
+		}
+	};
+
 	const updateStatusBar = async (editor: vscode.TextEditor | undefined): Promise<void> => {
-		const config = getConfig();
-		if (!config.enabled) {
-			statusBar.text = vscode.l10n.t('EOL: OFF');
-			return;
-		}
-		if (!editor) {
-			statusBar.text = vscode.l10n.t('EOL: --');
-			return;
-		}
-		const document = editor.document;
-		const current = mapEolEnum(document.eol);
-		const expectedInfo = await getExpectedEolInfo(document, config);
-		const mismatch = expectedInfo.expected !== 'auto' && current !== expectedInfo.expected;
-		statusBar.text = mismatch
-			? vscode.l10n.t('EOL: {0} ⚠️', current.toUpperCase())
-			: vscode.l10n.t('EOL: {0}', current.toUpperCase());
+		const status = await buildStatusBarState(editor, getConfig());
+		statusBar.text = status.text;
+		statusBar.tooltip = status.tooltip;
 	};
 
 	const handleDocument = async (document: vscode.TextDocument, reason: 'open' | 'save'): Promise<void> => {
@@ -112,52 +169,19 @@ export function activate(context: vscode.ExtensionContext): void {
 		}
 
 		const expectedInfo = await getExpectedEolInfo(document, config);
-		const expectedEol = expectedInfo.expected;
-		if (expectedEol === 'auto') {
+		if (expectedInfo.expected === 'auto') {
 			await updateStatusBar(vscode.window.activeTextEditor);
 			return;
 		}
 
-		const currentEol = mapEolEnum(document.eol);
-		const key = document.uri.toString();
-		const state = fileState.get(key) ?? { lastNotifiedAt: null, ignored: false };
-		const decision = decideAction({
-			currentEol,
-			expected: expectedEol,
-			mode: config.mode,
-			cooldownSeconds: config.cooldownSeconds,
-			nowMs: Date.now(),
-			lastNotifiedAt: state.lastNotifiedAt,
-			ignored: state.ignored,
-		});
-
-		if (decision.action === 'none') {
+		const decisionContext = buildDecisionContext(document, expectedInfo.expected, config, fileState);
+		if (!decisionContext) {
 			await updateStatusBar(vscode.window.activeTextEditor);
 			return;
 		}
 
-		state.lastNotifiedAt = Date.now();
-		fileState.set(key, state);
-
-		const currentLabel = currentEol.toUpperCase();
-		const expectedLabel = expectedEol.toUpperCase();
-
-		if (decision.action === 'warn') {
-			await showMismatchWarning(currentLabel, expectedLabel);
-			await updateStatusBar(vscode.window.activeTextEditor);
-			return;
-		}
-
-		if (decision.action === 'prompt') {
-			const choice = await promptToFix(currentLabel, expectedLabel);
-			if (choice === 'convert') {
-				const result = await convertDocumentEol(document, expectedEol);
-				await showConversionMessage(expectedEol, result.status);
-			} else if (choice === 'ignore') {
-				fileState.set(key, { ...state, ignored: true });
-			}
-			await updateStatusBar(vscode.window.activeTextEditor);
-		}
+		await applyDecision(decisionContext, fileState);
+		await updateStatusBar(vscode.window.activeTextEditor);
 	};
 
 	const onOpen = vscode.workspace.onDidOpenTextDocument((document) => {
@@ -235,12 +259,12 @@ export function activate(context: vscode.ExtensionContext): void {
 			if (!choice) {
 				return;
 			}
-				const target = choice === 'LF' ? 'lf' : 'crlf';
-				const result = await convertDocumentEol(editor.document, target);
-				await showConversionMessage(target, result.status);
-				await updateStatusBar(editor);
-				return;
-			}
+			const target = choice === 'LF' ? 'lf' : 'crlf';
+			const result = await convertDocumentEol(editor.document, target);
+			await showConversionMessage(target, result.status);
+			await updateStatusBar(editor);
+			return;
+		}
 		const result = await convertDocumentEol(editor.document, expectedEol);
 		await showConversionMessage(expectedEol, result.status);
 		await updateStatusBar(editor);
@@ -252,9 +276,17 @@ export function activate(context: vscode.ExtensionContext): void {
 			return;
 		}
 		const config = getConfig();
+		if (isIgnored(editor.document, config)) {
+			await vscode.window.showInformationMessage(vscode.l10n.t('EOL Guardian ignored for this file.'));
+			return;
+		}
 		const current = mapEolEnum(editor.document.eol);
 		const expectedInfo = await getExpectedEolInfo(editor.document, config);
-		const sourceLabel = buildSourceLabel(expectedInfo.source, expectedInfo.sourcePath);
+		const sourceLabel = buildSourceLabel(
+			expectedInfo.source,
+			expectedInfo.sourceDetail,
+			expectedInfo.sourcePath,
+		);
 		await vscode.window.showInformationMessage(
 			vscode.l10n.t(
 				'Current: {0} | Expected: {1} ({2})',
@@ -272,6 +304,51 @@ export function activate(context: vscode.ExtensionContext): void {
 		await updateStatusBar(vscode.window.activeTextEditor);
 	});
 
+	const setModeCommand = vscode.commands.registerCommand(COMMAND_SET_MODE, async () => {
+		const config = vscode.workspace.getConfiguration('eolGuardian');
+		const options = [
+			{ label: 'detectOnly', description: vscode.l10n.t('Warn only'), value: 'detectOnly' as const },
+			{ label: 'askBeforeFix', description: vscode.l10n.t('Ask before converting'), value: 'askBeforeFix' as const },
+			{ label: 'fixOnSave', description: vscode.l10n.t('Fix automatically on save'), value: 'fixOnSave' as const },
+		];
+		const pick = await vscode.window.showQuickPick(options, {
+			placeHolder: vscode.l10n.t('Choose EOL Guardian mode'),
+		});
+		if (!pick) {
+			return;
+		}
+		await config.update('mode', pick.value, vscode.ConfigurationTarget.Global);
+		await vscode.window.showInformationMessage(vscode.l10n.t('Mode set to {0}.', pick.label));
+		await updateStatusBar(vscode.window.activeTextEditor);
+	});
+
+	const fixWorkspaceCommand = vscode.commands.registerCommand(COMMAND_FIX_WORKSPACE, async () => {
+		const config = getConfig();
+		if (!config.enabled) {
+			await vscode.window.showInformationMessage(vscode.l10n.t('EOL Guardian is disabled.'));
+			return;
+		}
+		const convertLabel = vscode.l10n.t(CONVERT_ACTION);
+		const cancelLabel = vscode.l10n.t('Cancel');
+		const confirm = await vscode.window.showWarningMessage(
+			vscode.l10n.t('Fix EOL for all files in workspace?'),
+			convertLabel,
+			cancelLabel,
+		);
+		if (confirm !== convertLabel) {
+			return;
+		}
+
+		await vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: vscode.l10n.t('EOL Guardian: Fixing workspace'),
+				cancellable: true,
+			},
+			async (progress, token) => runWorkspaceFix(config, progress, token),
+		);
+	});
+
 	context.subscriptions.push(
 		statusBar,
 		onOpen,
@@ -282,6 +359,8 @@ export function activate(context: vscode.ExtensionContext): void {
 		fixCommand,
 		showCommand,
 		toggleCommand,
+		setModeCommand,
+		fixWorkspaceCommand,
 	);
 
 	void updateStatusBar(vscode.window.activeTextEditor);
@@ -289,6 +368,80 @@ export function activate(context: vscode.ExtensionContext): void {
 
 export function deactivate(): void {
 	// No cleanup required.
+}
+
+async function buildStatusBarState(
+	editor: vscode.TextEditor | undefined,
+	config: Config,
+): Promise<StatusBarState> {
+	if (!config.enabled) {
+		return { text: vscode.l10n.t('EOL: OFF') };
+	}
+	if (!editor) {
+		return { text: vscode.l10n.t('EOL: --') };
+	}
+	const document = editor.document;
+	const current = mapEolEnum(document.eol);
+	if (isIgnored(document, config)) {
+		return buildIgnoredStatusState(current);
+	}
+	const expectedInfo = await getExpectedEolInfo(document, config);
+	return buildActiveStatusState(current, expectedInfo);
+}
+
+function buildIgnoredStatusState(current: string): StatusBarState {
+	return {
+		text: vscode.l10n.t('EOL: {0} ({1})', current.toUpperCase(), vscode.l10n.t('ignored')),
+		tooltip: vscode.l10n.t('Ignored by pattern'),
+	};
+}
+
+function buildActiveStatusState(current: string, expectedInfo: ExpectedEolInfo): StatusBarState {
+	const sourceLabel = buildSourceLabel(expectedInfo.source, expectedInfo.sourceDetail, expectedInfo.sourcePath);
+	const mismatch = expectedInfo.expected !== 'auto' && current !== expectedInfo.expected;
+	const currentLabel = current.toUpperCase();
+	const expectedLabel = expectedInfo.expected.toUpperCase();
+	return {
+		text: mismatch
+			? vscode.l10n.t('EOL: {0} ({1}) ⚠️', currentLabel, sourceLabel)
+			: vscode.l10n.t('EOL: {0} ({1})', currentLabel, sourceLabel),
+		tooltip: buildStatusTooltip(currentLabel, expectedLabel, sourceLabel, sessionFixes),
+	};
+}
+
+function buildDecisionContext(
+	document: vscode.TextDocument,
+	expectedEol: 'lf' | 'crlf',
+	config: Config,
+	states: Map<string, FileState>,
+): DecisionContext | null {
+	const currentEol = mapEolEnum(document.eol);
+	const key = document.uri.toString();
+	const state = states.get(key) ?? { lastNotifiedAt: null, ignored: false };
+	const nowMs = Date.now();
+	const decision = decideAction({
+		currentEol,
+		expected: expectedEol,
+		mode: config.mode,
+		cooldownSeconds: config.cooldownSeconds,
+		nowMs,
+		lastNotifiedAt: state.lastNotifiedAt,
+		ignored: state.ignored,
+	});
+	if (decision.action === 'none') {
+		return null;
+	}
+	state.lastNotifiedAt = nowMs;
+	states.set(key, state);
+	return {
+		document,
+		expectedEol,
+		decision,
+		currentLabel: currentEol.toUpperCase(),
+		expectedLabel: expectedEol.toUpperCase(),
+		key,
+		state,
+	};
 }
 
 async function convertDocumentEol(document: vscode.TextDocument, target: 'lf' | 'crlf'): Promise<ConversionResult> {
@@ -316,11 +469,7 @@ async function convertDocumentEol(document: vscode.TextDocument, target: 'lf' | 
 	return { status: applied ? 'changed' : 'failed' };
 }
 
-async function getExpectedEolInfo(document: vscode.TextDocument, config: Config): Promise<{
-	expected: 'lf' | 'crlf' | 'auto';
-	source: 'editorconfig' | 'settings' | 'auto';
-	sourcePath?: string;
-}> {
+async function getExpectedEolInfo(document: vscode.TextDocument, config: Config): Promise<ExpectedEolInfo> {
 	let editorconfigValue: 'lf' | 'crlf' | null = null;
 	let sourcePath: string | undefined;
 	if (config.respectEditorConfig && document.uri.scheme === 'file') {
@@ -330,12 +479,25 @@ async function getExpectedEolInfo(document: vscode.TextDocument, config: Config)
 			sourcePath = result.sourcePath;
 		}
 	}
-	const resolved = resolveExpectedEol(config.expectedEOL, editorconfigValue, config.respectEditorConfig);
-	return { expected: resolved.expected, source: resolved.source, sourcePath };
+	const override = resolveOverrideEol(document, config);
+	const resolved = resolveExpectedEol(
+		config.expectedEOL,
+		editorconfigValue,
+		config.respectEditorConfig,
+		override?.eol,
+	);
+	return {
+		expected: resolved.expected,
+		source: resolved.source,
+		sourcePath,
+		sourceDetail: override?.detail,
+	};
 }
 
 function getConfig(): Config {
 	const config = vscode.workspace.getConfiguration('eolGuardian');
+	const overridesRaw = config.get<OverrideConfig[]>('overrides', []);
+	const ignoreRaw = config.get<string[]>('ignore', []);
 	return {
 		enabled: config.get<boolean>('enabled', true),
 		expectedEOL: config.get<'lf' | 'crlf' | 'auto'>('expectedEOL', 'auto'),
@@ -344,7 +506,162 @@ function getConfig(): Config {
 		mode: config.get<'detectOnly' | 'askBeforeFix' | 'fixOnSave'>('mode', 'detectOnly'),
 		cooldownSeconds: config.get<number>('cooldownSeconds', 60),
 		respectEditorConfig: config.get<boolean>('respectEditorConfig', true),
+		overrides: sanitizeOverrides(overridesRaw),
+		ignore: sanitizeIgnore(ignoreRaw),
 	};
+}
+
+function sanitizeOverrides(overrides: OverrideConfig[]): OverrideConfig[] {
+	return (overrides ?? [])
+		.filter(Boolean)
+		.filter((override) => override.eol === 'lf' || override.eol === 'crlf')
+		.filter((override) => Boolean(override.languageId) || Boolean(override.pattern))
+		.map((override) => ({
+			languageId: override.languageId?.trim() || undefined,
+			pattern: override.pattern?.trim() || undefined,
+			eol: override.eol,
+			description: override.description?.trim() || undefined,
+		}));
+}
+
+function sanitizeIgnore(list: string[]): string[] {
+	return (list ?? []).map((entry) => entry.trim()).filter((entry) => entry.length > 0);
+}
+
+function resolveOverrideEol(
+	document: vscode.TextDocument,
+	config: Config,
+): { eol: 'lf' | 'crlf'; detail?: string } | null {
+	if (config.overrides.length === 0) {
+		return null;
+	}
+	const pathForMatch = getPathForMatch(document);
+	const matched = config.overrides.find((override) => matchesOverride(override, document, pathForMatch));
+	if (!matched) {
+		return null;
+	}
+	return { eol: matched.eol, detail: buildOverrideDetail(matched) };
+}
+
+function matchesOverride(
+	override: OverrideConfig,
+	document: vscode.TextDocument,
+	pathForMatch: string | null,
+): boolean {
+	if (override.languageId && override.languageId !== document.languageId) {
+		return false;
+	}
+	if (!override.pattern) {
+		return true;
+	}
+	if (!pathForMatch) {
+		return false;
+	}
+	return matchGlob(override.pattern, pathForMatch);
+}
+
+function buildOverrideDetail(override: OverrideConfig): string | undefined {
+	const detailParts: string[] = [];
+	if (override.languageId) {
+		detailParts.push(`lang:${override.languageId}`);
+	}
+	if (override.pattern) {
+		detailParts.push(override.pattern);
+	}
+	const detail = detailParts.join(', ');
+	return detail.length > 0 ? detail : undefined;
+}
+
+function isIgnored(document: vscode.TextDocument, config: Config): boolean {
+	if (config.ignore.length === 0) {
+		return false;
+	}
+	const pathForMatch = getPathForMatch(document);
+	if (!pathForMatch) {
+		return false;
+	}
+	return config.ignore.some((pattern) => matchGlob(pattern, pathForMatch));
+}
+
+async function runWorkspaceFix(
+	config: Config,
+	progress: vscode.Progress<{ message?: string }>,
+	token: vscode.CancellationToken,
+): Promise<void> {
+	const files = await vscode.workspace.findFiles('**/*', DEFAULT_EXCLUDE);
+	let updated = 0;
+	let processed = 0;
+	for (const uri of files) {
+		if (token.isCancellationRequested) {
+			break;
+		}
+		const updatedFile = await safeProcessWorkspaceFile(uri, config);
+		if (updatedFile) {
+			updated += 1;
+			sessionFixes += 1;
+		}
+		processed += 1;
+		progress.report({
+			message: vscode.l10n.t('Processed {0} files', processed),
+		});
+	}
+	await vscode.window.showInformationMessage(
+		vscode.l10n.t('Workspace EOL fix complete. {0} files updated.', updated),
+	);
+}
+
+async function safeProcessWorkspaceFile(uri: vscode.Uri, config: Config): Promise<boolean> {
+	try {
+		return await processWorkspaceFile(uri, config);
+	} catch {
+		return false;
+	}
+}
+
+async function processWorkspaceFile(uri: vscode.Uri, config: Config): Promise<boolean> {
+	const document = await vscode.workspace.openTextDocument(uri);
+	if (!shouldProcessWorkspaceDocument(document, config)) {
+		return false;
+	}
+	const expectedInfo = await getExpectedEolInfo(document, config);
+	if (expectedInfo.expected === 'auto') {
+		return false;
+	}
+	const original = document.getText();
+	const converted = convertTextEol(original, expectedInfo.expected);
+	if (converted === original) {
+		return false;
+	}
+	const edit = new vscode.WorkspaceEdit();
+	edit.replace(uri, getFullRange(document), converted);
+	const applied = await vscode.workspace.applyEdit(edit);
+	if (!applied) {
+		return false;
+	}
+	await document.save();
+	return true;
+}
+
+function shouldProcessWorkspaceDocument(document: vscode.TextDocument, config: Config): boolean {
+	if (!isTextDocument(document)) {
+		return false;
+	}
+	if (isIgnored(document, config)) {
+		return false;
+	}
+	return true;
+}
+
+function getPathForMatch(document: vscode.TextDocument): string | null {
+	if (document.uri.scheme === 'file') {
+		const folder = vscode.workspace.getWorkspaceFolder(document.uri);
+		const filePath = document.uri.fsPath;
+		if (folder) {
+			return normalizePath(path.relative(folder.uri.fsPath, filePath));
+		}
+		return normalizePath(filePath);
+	}
+	return document.fileName ? normalizePath(document.fileName) : null;
 }
 
 function isTextDocument(document: vscode.TextDocument): boolean {
@@ -369,18 +686,37 @@ function getFullRange(document: vscode.TextDocument): vscode.Range {
 	return new vscode.Range(0, 0, lastLine, lastLineText.length);
 }
 
-function buildSourceLabel(source: 'editorconfig' | 'settings' | 'auto', sourcePath?: string): string {
+function buildSourceLabel(
+	source: 'editorconfig' | 'override' | 'settings' | 'auto',
+	detail?: string,
+	sourcePath?: string,
+): string {
 	if (source === 'editorconfig') {
 		return sourcePath
 			? vscode.l10n.t('editorconfig ({0})', sourcePath)
 			: vscode.l10n.t('editorconfig');
 	}
+	if (source === 'override') {
+		return detail
+			? vscode.l10n.t('override ({0})', detail)
+			: vscode.l10n.t('override');
+	}
 	return vscode.l10n.t(source);
+}
+
+function buildStatusTooltip(current: string, expected: string, source: string, fixes: number): vscode.MarkdownString {
+	const tooltip = new vscode.MarkdownString();
+	tooltip.appendMarkdown(`${vscode.l10n.t('Current: {0}', current)}  \n`);
+	tooltip.appendMarkdown(`${vscode.l10n.t('Expected: {0}', expected)}  \n`);
+	tooltip.appendMarkdown(`${vscode.l10n.t('Source: {0}', source)}  \n`);
+	tooltip.appendMarkdown(`${vscode.l10n.t('Fixes this session: {0}', fixes)}`);
+	return tooltip;
 }
 
 async function showConversionMessage(target: 'lf' | 'crlf', status: ConversionResult['status']): Promise<void> {
 	const label = target.toUpperCase();
 	if (status === 'changed') {
+		sessionFixes += 1;
 		await vscode.window.showInformationMessage(vscode.l10n.t('EOL corrected to {0}.', label));
 		return;
 	}

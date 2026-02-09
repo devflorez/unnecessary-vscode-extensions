@@ -4,6 +4,8 @@
   "command.fix": "EOL Guardian: Fix Current File EOL",
   "command.show": "EOL Guardian: Show Current File EOL",
   "command.toggle": "EOL Guardian: Toggle Enabled",
+  "command.setMode": "EOL Guardian: Set Mode",
+  "command.fixWorkspace": "EOL Guardian: Fix Workspace EOL",
   "configuration.title": "EOL Guardian",
   "configuration.enabled.description": "Enable or disable EOL Guardian.",
   "configuration.expectedEOL.description": "Expected line ending. Use auto to rely on editorconfig or do nothing.",
@@ -11,5 +13,11 @@
   "configuration.detectOnSave.description": "Detect EOL mismatches when saving files.",
   "configuration.mode.description": "Behavior when a mismatch is detected.",
   "configuration.cooldownSeconds.description": "Cooldown per file between warnings/prompts.",
-  "configuration.respectEditorConfig.description": "Use .editorconfig end_of_line when present."
+  "configuration.respectEditorConfig.description": "Use .editorconfig end_of_line when present.",
+  "configuration.overrides.description": "Override expected EOL by language id or glob pattern.",
+  "configuration.overrides.item.languageId": "VS Code language id to match (e.g. javascript).",
+  "configuration.overrides.item.pattern": "Glob pattern to match files (e.g. **/*.sh).",
+  "configuration.overrides.item.eol": "EOL to enforce for matching files.",
+  "configuration.overrides.item.description": "Optional description for the override.",
+  "configuration.ignore.description": "Glob patterns to ignore from EOL checks."
 }

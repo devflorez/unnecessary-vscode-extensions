@@ -1,6 +1,6 @@
 export type EolKind = 'lf' | 'crlf' | 'auto';
 export type Mode = 'detectOnly' | 'askBeforeFix' | 'fixOnSave';
-export type ExpectedEolSource = 'editorconfig' | 'settings' | 'auto';
+export type ExpectedEolSource = 'editorconfig' | 'override' | 'settings' | 'auto';
 
 export type ExpectedEolResult = {
 	expected: EolKind;
@@ -30,9 +30,13 @@ export function resolveExpectedEol(
 	settingsExpected: EolKind,
 	editorconfigEol: 'lf' | 'crlf' | null | undefined,
 	respectEditorConfig: boolean,
+	overrideEol?: 'lf' | 'crlf',
 ): ExpectedEolResult {
 	if (respectEditorConfig && editorconfigEol) {
 		return { expected: editorconfigEol, source: 'editorconfig' };
+	}
+	if (overrideEol) {
+		return { expected: overrideEol, source: 'override' };
 	}
 	if (settingsExpected === 'auto') {
 		return { expected: 'auto', source: 'auto' };

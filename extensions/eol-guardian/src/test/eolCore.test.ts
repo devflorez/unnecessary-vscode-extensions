@@ -26,9 +26,15 @@ suite('EOL Core', () => {
 	});
 
 	test('resolves expected EOL with editorconfig priority', () => {
-		const resolved = resolveExpectedEol('lf', 'crlf', true);
+		const resolved = resolveExpectedEol('lf', 'crlf', true, 'lf');
 		assert.strictEqual(resolved.expected, 'crlf');
 		assert.strictEqual(resolved.source, 'editorconfig');
+	});
+
+	test('resolves expected EOL with override before settings', () => {
+		const resolved = resolveExpectedEol('lf', null, true, 'crlf');
+		assert.strictEqual(resolved.expected, 'crlf');
+		assert.strictEqual(resolved.source, 'override');
 	});
 
 	test('resolves expected EOL to auto', () => {

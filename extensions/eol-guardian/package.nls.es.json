@@ -4,6 +4,8 @@
   "command.fix": "EOL Guardian: Corregir EOL del archivo actual",
   "command.show": "EOL Guardian: Mostrar EOL del archivo actual",
   "command.toggle": "EOL Guardian: Alternar activado",
+  "command.setMode": "EOL Guardian: Cambiar modo",
+  "command.fixWorkspace": "EOL Guardian: Corregir EOL del workspace",
   "configuration.title": "EOL Guardian",
   "configuration.enabled.description": "Habilita o deshabilita EOL Guardian.",
   "configuration.expectedEOL.description": "Final de línea esperado. Usa auto para depender de editorconfig o no hacer nada.",
@@ -11,5 +13,11 @@
   "configuration.detectOnSave.description": "Detectar mismatches al guardar archivos.",
   "configuration.mode.description": "Comportamiento cuando hay mismatch.",
   "configuration.cooldownSeconds.description": "Cooldown por archivo entre avisos.",
-  "configuration.respectEditorConfig.description": "Usar end_of_line de .editorconfig cuando exista."
+  "configuration.respectEditorConfig.description": "Usar end_of_line de .editorconfig cuando exista.",
+  "configuration.overrides.description": "Sobrescribir el EOL esperado por lenguaje o patrón.",
+  "configuration.overrides.item.languageId": "Language id de VS Code (ej. javascript).",
+  "configuration.overrides.item.pattern": "Patrón glob para archivos (ej. **/*.sh).",
+  "configuration.overrides.item.eol": "EOL que se aplicará a los archivos que coincidan.",
+  "configuration.overrides.item.description": "Descripción opcional del override.",
+  "configuration.ignore.description": "Patrones glob a ignorar en las verificaciones."
 }

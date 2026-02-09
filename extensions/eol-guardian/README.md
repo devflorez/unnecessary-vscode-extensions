@@ -6,7 +6,9 @@ EOL Guardian detects and (optionally) fixes line endings (LF vs CRLF) based on y
 - Detects EOL mismatches on open/save.
 - Supports three modes: detect-only, ask-before-fix, or fix-on-save.
 - Honors `.editorconfig` `end_of_line` when enabled (with common glob patterns like `**` and `{a,b}`).
-- Adds a status bar indicator with mismatch warnings.
+- Allows per-language or per-pattern overrides.
+- Supports ignore patterns.
+- Adds a status bar indicator with mismatch warnings and source.
 
 ## Modes
 - `detectOnly` (default): shows a warning if EOL mismatches.
@@ -23,11 +25,27 @@ EOL Guardian detects and (optionally) fixes line endings (LF vs CRLF) based on y
 | `eolGuardian.mode` | string | `detectOnly` | `detectOnly`, `askBeforeFix`, `fixOnSave`. |
 | `eolGuardian.cooldownSeconds` | number | `60` | Cooldown per file. |
 | `eolGuardian.respectEditorConfig` | boolean | `true` | Use `.editorconfig` if present. |
+| `eolGuardian.overrides` | array | `[]` | Override EOL by language id or glob pattern. |
+| `eolGuardian.ignore` | array | `[]` | Glob patterns to ignore. |
+
+Example overrides:
+```json
+"eolGuardian.overrides": [
+  { "languageId": "powershell", "eol": "crlf" },
+  { "pattern": "**/*.sh", "eol": "lf" }
+],
+"eolGuardian.ignore": [
+  "dist/**",
+  "**/*.min.js"
+]
+```
 
 ## Commands
 - `EOL Guardian: Fix Current File EOL`
 - `EOL Guardian: Show Current File EOL`
 - `EOL Guardian: Toggle Enabled`
+- `EOL Guardian: Set Mode`
+- `EOL Guardian: Fix Workspace EOL`
 
 ## Development
 From the repo root:

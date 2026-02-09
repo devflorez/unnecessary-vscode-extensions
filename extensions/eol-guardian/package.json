@@ -3,7 +3,7 @@
   "publisher": "devflorez",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.103.0"
   },
@@ -46,6 +46,14 @@
       {
         "command": "eol-guardian.toggleEnabled",
         "title": "%command.toggle%"
+      },
+      {
+        "command": "eol-guardian.setMode",
+        "title": "%command.setMode%"
+      },
+      {
+        "command": "eol-guardian.fixWorkspaceEol",
+        "title": "%command.fixWorkspace%"
       }
     ],
     "configuration": {
@@ -87,6 +95,42 @@
           "type": "boolean",
           "default": true,
           "description": "%configuration.respectEditorConfig.description%"
+        },
+        "eolGuardian.overrides": {
+          "type": "array",
+          "default": [],
+          "description": "%configuration.overrides.description%",
+          "items": {
+            "type": "object",
+            "properties": {
+              "languageId": {
+                "type": "string",
+                "description": "%configuration.overrides.item.languageId%"
+              },
+              "pattern": {
+                "type": "string",
+                "description": "%configuration.overrides.item.pattern%"
+              },
+              "eol": {
+                "type": "string",
+                "enum": ["lf", "crlf"],
+                "description": "%configuration.overrides.item.eol%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%configuration.overrides.item.description%"
+              }
+            },
+            "required": ["eol"]
+          }
+        },
+        "eolGuardian.ignore": {
+          "type": "array",
+          "default": [],
+          "description": "%configuration.ignore.description%",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
