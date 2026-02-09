@@ -172,7 +172,7 @@ export function activate(context: vscode.ExtensionContext): void {
 				const pending = state.pendingFixEol;
 				state.pendingFixEol = undefined;
 				fileState.set(document.uri.toString(), state);
-				void showFixMessage(pending);
+				void showConversionMessage(pending, 'changed');
 			}
 			void updateStatusBar(vscode.window.activeTextEditor);
 			return;
