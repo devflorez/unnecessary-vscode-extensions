@@ -1,0 +1,37 @@
+name: Publish EOL Guardian
+
+on:
+  push:
+    tags:
+      - 'eol-guardian/v*'
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extensions/eol-guardian
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: extensions/eol-guardian/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run package --if-present
+
+      - name: Test
+        run: npm test --if-present
+
+      - name: Publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx @vscode/vsce publish --pat $VSCE_PAT

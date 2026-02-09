@@ -1,0 +1,15 @@
+{
+  "extension.displayName": "EOL Guardian",
+  "extension.description": "Detecta y corrige finales de línea (LF/CRLF) con valores seguros",
+  "command.fix": "EOL Guardian: Corregir EOL del archivo actual",
+  "command.show": "EOL Guardian: Mostrar EOL del archivo actual",
+  "command.toggle": "EOL Guardian: Alternar activado",
+  "configuration.title": "EOL Guardian",
+  "configuration.enabled.description": "Habilita o deshabilita EOL Guardian.",
+  "configuration.expectedEOL.description": "Final de línea esperado. Usa auto para depender de editorconfig o no hacer nada.",
+  "configuration.detectOnOpen.description": "Detectar mismatches al abrir archivos.",
+  "configuration.detectOnSave.description": "Detectar mismatches al guardar archivos.",
+  "configuration.mode.description": "Comportamiento cuando hay mismatch.",
+  "configuration.cooldownSeconds.description": "Cooldown por archivo entre avisos.",
+  "configuration.respectEditorConfig.description": "Usar end_of_line de .editorconfig cuando exista."
+}

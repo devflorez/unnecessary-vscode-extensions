@@ -1,0 +1,18 @@
+{
+  "EOL: OFF": "EOL: OFF",
+  "EOL: --": "EOL: --",
+  "EOL: {0}": "EOL: {0}",
+  "EOL: {0} ⚠️": "EOL: {0} ⚠️",
+  "EOL mismatch: {0} found, expected {1}.": "EOL mismatch: {0} found, expected {1}.",
+  "Convert": "Convert",
+  "Ignore": "Ignore",
+  "Choose target EOL": "Choose target EOL",
+  "EOL corrected to {0}.": "EOL corrected to {0}.",
+  "EOL already {0}.": "EOL already {0}.",
+  "EOL update failed.": "EOL update failed.",
+  "Current: {0} | Expected: {1} ({2})": "Current: {0} | Expected: {1} ({2})",
+  "editorconfig ({0})": "editorconfig ({0})",
+  "editorconfig": "editorconfig",
+  "settings": "settings",
+  "auto": "auto"
+}
