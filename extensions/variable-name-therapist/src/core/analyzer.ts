@@ -439,7 +439,7 @@ function evaluateName(
 		}
 		return 'single-letter';
 	}
-	if (isGenericName(lower, nameConfig)) {
+	if (isGenericName(name, lower, nameConfig)) {
 		return 'generic';
 	}
 	if (nameConfig.keyboardMash.has(lower) || REPEAT_LETTER.test(name)) {
@@ -463,18 +463,18 @@ function normalizeLocale(locale: string): Locale {
 	return 'en';
 }
 
-function isGenericName(lower: string, nameConfig: NameConfig): boolean {
+function isGenericName(name: string, lower: string, nameConfig: NameConfig): boolean {
 	if (nameConfig.genericNames.has(lower)) {
 		return true;
 	}
 	if (nameConfig.genericPatterns.some((pattern) => pattern.test(lower))) {
 		return true;
 	}
-	return isCompositeGeneric(lower, nameConfig);
+	return isCompositeGeneric(name, nameConfig);
 }
 
-function isCompositeGeneric(lower: string, nameConfig: NameConfig): boolean {
-	const tokens = splitNameTokens(lower);
+function isCompositeGeneric(name: string, nameConfig: NameConfig): boolean {
+	const tokens = splitNameTokens(name);
 	if (tokens.length < 2) {
 		return false;
 	}
