@@ -3,7 +3,7 @@
   "publisher": "devflorez",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "icon": "media/cinematic-errors-icon.png",
+  "icon": "media/cinematic-icon.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.103.0"
