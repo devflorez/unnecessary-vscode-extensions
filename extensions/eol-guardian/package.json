@@ -96,6 +96,11 @@
           "default": true,
           "description": "%configuration.respectEditorConfig.description%"
         },
+        "eolGuardian.finalNewlineOnly": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.finalNewlineOnly.description%"
+        },
         "eolGuardian.overrides": {
           "type": "array",
           "default": [],

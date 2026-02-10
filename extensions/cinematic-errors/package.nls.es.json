@@ -1,0 +1,21 @@
+{
+  "extension.displayName": "Errores Cinemáticos",
+  "extension.description": "Convierte errores comunes en mensajes tipo tráiler",
+  "command.toggleEnabled": "Errores Cinemáticos: Activar / Desactivar",
+  "command.showLastTrailer": "Errores Cinemáticos: Mostrar último tráiler",
+  "command.resetCooldown": "Errores Cinemáticos: Reiniciar enfriamiento",
+  "configuration.title": "Errores Cinemáticos",
+  "configuration.enabled.description": "Habilita Errores Cinemáticos.",
+  "configuration.cooldownSeconds.description": "Enfriamiento (segundos) entre mensajes cinematográficos.",
+  "configuration.showOnEveryError.description": "Muestra un tráiler cuando cambian los errores, aunque no sean nuevos.",
+  "configuration.useWebview.description": "Muestra el tráiler en un panel webview en lugar de un aviso.",
+  "configuration.showInlineHover.description": "Muestra un hover cinematográfico sobre la línea del error.",
+  "configuration.showGutterIcon.description": "Muestra un icono de película en el gutter para líneas con error.",
+  "configuration.showInlineMessage.description": "Muestra el mensaje cinematográfico encima de la línea con error.",
+  "configuration.viewLocation.description": "Dónde mostrar la vista del tráiler cinematográfico.",
+  "configuration.autoRevealView.description": "Revelar automáticamente la vista cinematográfica cuando aparezca un nuevo tráiler.",
+  "views.container.title": "Errores Cinemáticos",
+  "views.trailer.name": "Tráiler",
+  "views.panel.container.title": "Errores Cinemáticos",
+  "views.panel.trailer.name": "Tráiler (Panel)"
+}

@@ -25,6 +25,7 @@ EOL Guardian detects and (optionally) fixes line endings (LF vs CRLF) based on y
 | `eolGuardian.mode` | string | `detectOnly` | `detectOnly`, `askBeforeFix`, `fixOnSave`. |
 | `eolGuardian.cooldownSeconds` | number | `60` | Cooldown per file. |
 | `eolGuardian.respectEditorConfig` | boolean | `true` | Use `.editorconfig` if present. |
+| `eolGuardian.finalNewlineOnly` | boolean | `true` | Only add a final newline; do not convert line endings. |
 | `eolGuardian.overrides` | array | `[]` | Override EOL by language id or glob pattern. |
 | `eolGuardian.ignore` | array | `[]` | Glob patterns to ignore. |
 

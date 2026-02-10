@@ -14,6 +14,7 @@
   "configuration.mode.description": "Behavior when a mismatch is detected.",
   "configuration.cooldownSeconds.description": "Cooldown per file between warnings/prompts.",
   "configuration.respectEditorConfig.description": "Use .editorconfig end_of_line when present.",
+  "configuration.finalNewlineOnly.description": "Only enforce a final newline without converting line endings.",
   "configuration.overrides.description": "Override expected EOL by language id or glob pattern.",
   "configuration.overrides.item.languageId": "VS Code language id to match (e.g. javascript).",
   "configuration.overrides.item.pattern": "Glob pattern to match files (e.g. **/*.sh).",

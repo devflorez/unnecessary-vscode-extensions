@@ -14,6 +14,7 @@
   "configuration.mode.description": "Comportamiento cuando hay mismatch.",
   "configuration.cooldownSeconds.description": "Cooldown por archivo entre avisos.",
   "configuration.respectEditorConfig.description": "Usar end_of_line de .editorconfig cuando exista.",
+  "configuration.finalNewlineOnly.description": "Solo agregar salto de línea final sin convertir EOL.",
   "configuration.overrides.description": "Sobrescribir el EOL esperado por lenguaje o patrón.",
   "configuration.overrides.item.languageId": "Language id de VS Code (ej. javascript).",
   "configuration.overrides.item.pattern": "Patrón glob para archivos (ej. **/*.sh).",

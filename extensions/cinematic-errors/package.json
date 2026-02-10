@@ -1,0 +1,163 @@
+{
+  "name": "cinematic-errors",
+  "publisher": "devflorez",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "icon": "media/cinematic-errors-icon.png",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Other"
+  ],
+  "keywords": [
+    "errors",
+    "diagnostics",
+    "debugging",
+    "cinematic",
+    "fun"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions"
+  },
+  "bugs": {
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions/issues"
+  },
+  "homepage": "https://github.com/devflorez/unnecessary-vscode-extensions#readme",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:cinematic-errors.toggleEnabled",
+    "onCommand:cinematic-errors.showLastTrailer",
+    "onCommand:cinematic-errors.resetCooldown"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cinematicErrors",
+          "title": "%views.container.title%",
+          "icon": "media/cinematic-errors-icon.png"
+        }
+      ],
+      "panel": [
+        {
+          "id": "cinematicErrorsPanel",
+          "title": "%views.panel.container.title%",
+          "icon": "media/cinematic-errors-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "cinematicErrors": [
+        {
+          "id": "cinematicErrors.trailerView",
+          "name": "%views.trailer.name%",
+          "type": "webview"
+        }
+      ],
+      "cinematicErrorsPanel": [
+        {
+          "id": "cinematicErrors.panelView",
+          "name": "%views.panel.trailer.name%",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "cinematic-errors.toggleEnabled",
+        "title": "%command.toggleEnabled%"
+      },
+      {
+        "command": "cinematic-errors.showLastTrailer",
+        "title": "%command.showLastTrailer%"
+      },
+      {
+        "command": "cinematic-errors.resetCooldown",
+        "title": "%command.resetCooldown%"
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "cinematicErrors.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.enabled.description%"
+        },
+        "cinematicErrors.cooldownSeconds": {
+          "type": "number",
+          "default": 30,
+          "description": "%configuration.cooldownSeconds.description%"
+        },
+        "cinematicErrors.showOnEveryError": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.showOnEveryError.description%"
+        },
+        "cinematicErrors.useWebview": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.useWebview.description%"
+        },
+        "cinematicErrors.showInlineHover": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.showInlineHover.description%"
+        },
+        "cinematicErrors.showGutterIcon": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.showGutterIcon.description%"
+        },
+        "cinematicErrors.showInlineMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "%configuration.showInlineMessage.description%"
+        },
+        "cinematicErrors.viewLocation": {
+          "type": "string",
+          "enum": ["sidebar", "panel"],
+          "default": "panel",
+          "description": "%configuration.viewLocation.description%"
+        },
+        "cinematicErrors.autoRevealView": {
+          "type": "boolean",
+          "default": false,
+          "description": "%configuration.autoRevealView.description%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.54.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

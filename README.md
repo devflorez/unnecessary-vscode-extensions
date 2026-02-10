@@ -16,6 +16,7 @@ This repository is built in public to:
 | Rubber Duck Copilot | Thoughtful rubber duck questions when you save or hit errors | ✅ Ready |
 | Commit Mood Translator | Translate commit messages into expressive moods | ✅ Ready |
 | EOL Guardian | Detect and fix line endings (LF/CRLF) safely | ✅ Ready |
+| Cinematic Errors | Turn errors into movie-trailer style messages | ✅ Ready |
 
 ## Structure
 ```text
@@ -24,6 +25,7 @@ extensions/
   ├── rubber-duck-copilot/
   ├── commit-mood-translator/
   ├── eol-guardian/
+  ├── cinematic-errors/
 ```
 
 ## Publishing
@@ -36,6 +38,7 @@ Steps:
    - Rubber Duck Copilot: `git tag rubber-duck-copilot/v1.0.0` then `git push origin rubber-duck-copilot/v1.0.0`
    - Commit Mood Translator: `git tag commit-mood-translator/v1.0.0` then `git push origin commit-mood-translator/v1.0.0`
    - EOL Guardian: `git tag eol-guardian/v1.0.0` then `git push origin eol-guardian/v1.0.0`
+   - Cinematic Errors: `git tag cinematic-errors/v1.0.0` then `git push origin cinematic-errors/v1.0.0`
 3. The GitHub Actions workflow publishes via `vsce publish`.
 
 Local dry run (Self Esteem Linter):
@@ -59,5 +62,11 @@ npx @vscode/vsce package
 Local dry run (EOL Guardian):
 ```bash
 cd unnecessary-vscode-extensions/extensions/eol-guardian
+npx @vscode/vsce package
+```
+
+Local dry run (Cinematic Errors):
+```bash
+cd unnecessary-vscode-extensions/extensions/cinematic-errors
 npx @vscode/vsce package
 ```

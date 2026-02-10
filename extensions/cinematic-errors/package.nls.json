@@ -1,0 +1,21 @@
+{
+  "extension.displayName": "Cinematic Errors",
+  "extension.description": "Turn common errors into cinematic, trailer-style messages",
+  "command.toggleEnabled": "Cinematic Errors: Enable / Disable",
+  "command.showLastTrailer": "Cinematic Errors: Show Last Error Trailer",
+  "command.resetCooldown": "Cinematic Errors: Reset Cooldown",
+  "configuration.title": "Cinematic Errors",
+  "configuration.enabled.description": "Enable Cinematic Errors.",
+  "configuration.cooldownSeconds.description": "Cooldown (seconds) between cinematic messages.",
+  "configuration.showOnEveryError.description": "Show a trailer whenever errors change, even if no new errors were added.",
+  "configuration.useWebview.description": "Show trailers inside a cinematic webview panel instead of a toast.",
+  "configuration.showInlineHover.description": "Show a cinematic hover on the error line.",
+  "configuration.showGutterIcon.description": "Show a movie icon in the gutter for error lines.",
+  "configuration.showInlineMessage.description": "Show a cinematic message above the error line.",
+  "configuration.viewLocation.description": "Where to show the cinematic trailer view.",
+  "configuration.autoRevealView.description": "Automatically reveal the cinematic view when a new trailer appears.",
+  "views.container.title": "Cinematic Errors",
+  "views.trailer.name": "Trailer",
+  "views.panel.container.title": "Cinematic Errors",
+  "views.panel.trailer.name": "Trailer (Panel)"
+}

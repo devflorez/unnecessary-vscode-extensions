@@ -31,6 +31,7 @@ type Config = {
 	mode: 'detectOnly' | 'askBeforeFix' | 'fixOnSave';
 	cooldownSeconds: number;
 	respectEditorConfig: boolean;
+	finalNewlineOnly: boolean;
 	overrides: OverrideConfig[];
 	ignore: string[];
 };
@@ -46,6 +47,7 @@ type FileState = {
 	lastNotifiedAt: number | null;
 	ignored: boolean;
 	pendingFixEol?: 'lf' | 'crlf';
+	pendingFinalNewline?: boolean;
 };
 
 type ConversionResult = {
@@ -167,6 +169,11 @@ export function activate(context: vscode.ExtensionContext): void {
 			await updateStatusBar(vscode.window.activeTextEditor);
 			return;
 		}
+		if (config.finalNewlineOnly) {
+			await handleFinalNewline(document, config, fileState);
+			await updateStatusBar(vscode.window.activeTextEditor);
+			return;
+		}
 
 		const expectedInfo = await getExpectedEolInfo(document, config);
 		if (expectedInfo.expected === 'auto') {
@@ -192,7 +199,12 @@ export function activate(context: vscode.ExtensionContext): void {
 		const config = getConfig();
 		if (config.mode === 'fixOnSave') {
 			const state = fileState.get(document.uri.toString());
-			if (state?.pendingFixEol) {
+			if (config.finalNewlineOnly && state?.pendingFinalNewline) {
+				state.pendingFinalNewline = false;
+				fileState.set(document.uri.toString(), state);
+				void showFinalNewlineMessage('changed');
+			}
+			if (!config.finalNewlineOnly && state?.pendingFixEol) {
 				const pending = state.pendingFixEol;
 				state.pendingFixEol = undefined;
 				fileState.set(document.uri.toString(), state);
@@ -214,6 +226,16 @@ export function activate(context: vscode.ExtensionContext): void {
 		}
 		event.waitUntil(
 			(async () => {
+				if (config.finalNewlineOnly) {
+					const edits = buildFinalNewlineEdits(event.document);
+					if (edits.length > 0) {
+						const key = event.document.uri.toString();
+						const state = fileState.get(key) ?? { lastNotifiedAt: null, ignored: false };
+						state.pendingFinalNewline = true;
+						fileState.set(key, state);
+					}
+					return edits;
+				}
 				const expectedInfo = await getExpectedEolInfo(event.document, config);
 				if (expectedInfo.expected === 'auto') {
 					return [];
@@ -250,6 +272,12 @@ export function activate(context: vscode.ExtensionContext): void {
 			return;
 		}
 		const config = getConfig();
+		if (config.finalNewlineOnly) {
+			const result = await ensureFinalNewline(editor.document);
+			await showFinalNewlineMessage(result);
+			await updateStatusBar(editor);
+			return;
+		}
 		const expectedInfo = await getExpectedEolInfo(editor.document, config);
 		const expectedEol = expectedInfo.expected;
 		if (expectedEol === 'auto') {
@@ -278,6 +306,15 @@ export function activate(context: vscode.ExtensionContext): void {
 		const config = getConfig();
 		if (isIgnored(editor.document, config)) {
 			await vscode.window.showInformationMessage(vscode.l10n.t('EOL Guardian ignored for this file.'));
+			return;
+		}
+		if (config.finalNewlineOnly) {
+			const missing = !hasFinalNewline(editor.document);
+			await vscode.window.showInformationMessage(
+				missing
+					? vscode.l10n.t('Final newline: missing')
+					: vscode.l10n.t('Final newline: present'),
+			);
 			return;
 		}
 		const current = mapEolEnum(editor.document.eol);
@@ -385,6 +422,9 @@ async function buildStatusBarState(
 	if (isIgnored(document, config)) {
 		return buildIgnoredStatusState(current);
 	}
+	if (config.finalNewlineOnly) {
+		return buildFinalNewlineStatusState(current, document);
+	}
 	const expectedInfo = await getExpectedEolInfo(document, config);
 	return buildActiveStatusState(current, expectedInfo);
 }
@@ -407,6 +447,72 @@ function buildActiveStatusState(current: string, expectedInfo: ExpectedEolInfo):
 			: vscode.l10n.t('EOL: {0} ({1})', currentLabel, sourceLabel),
 		tooltip: buildStatusTooltip(currentLabel, expectedLabel, sourceLabel, sessionFixes),
 	};
+}
+
+function buildFinalNewlineStatusState(current: string, document: vscode.TextDocument): StatusBarState {
+	const missing = !hasFinalNewline(document);
+	const currentLabel = current.toUpperCase();
+	return {
+		text: missing
+			? vscode.l10n.t('EOL: {0} ⚠️', currentLabel)
+			: vscode.l10n.t('EOL: {0}', currentLabel),
+		tooltip: buildFinalNewlineTooltip(missing),
+	};
+}
+
+function buildFinalNewlineTooltip(missing: boolean): vscode.MarkdownString {
+	const tooltip = new vscode.MarkdownString();
+	tooltip.appendMarkdown(missing
+		? `${vscode.l10n.t('Final newline: missing')}  \\n`
+		: `${vscode.l10n.t('Final newline: present')}  \\n`);
+	return tooltip;
+}
+
+async function handleFinalNewline(
+	document: vscode.TextDocument,
+	config: Config,
+	fileState: Map<string, FileState>,
+): Promise<void> {
+	if (config.mode === 'fixOnSave') {
+		return;
+	}
+	const missing = !hasFinalNewline(document);
+	if (!missing) {
+		return;
+	}
+	const key = document.uri.toString();
+	const state = fileState.get(key) ?? { lastNotifiedAt: null, ignored: false };
+	if (state.ignored) {
+		return;
+	}
+	const now = Date.now();
+	if (state.lastNotifiedAt !== null) {
+		const elapsed = now - state.lastNotifiedAt;
+		if (elapsed < config.cooldownSeconds * 1000) {
+			return;
+		}
+	}
+	state.lastNotifiedAt = now;
+	fileState.set(key, state);
+	if (config.mode === 'detectOnly') {
+		await vscode.window.showWarningMessage(vscode.l10n.t('Missing final newline at end of file.'));
+		return;
+	}
+	const addLabel = vscode.l10n.t('Add newline');
+	const ignoreLabel = vscode.l10n.t('Ignore');
+	const action = await vscode.window.showWarningMessage(
+		vscode.l10n.t('Missing final newline at end of file.'),
+		addLabel,
+		ignoreLabel,
+	);
+	if (action === addLabel) {
+		const result = await ensureFinalNewline(document);
+		await showFinalNewlineMessage(result);
+		return;
+	}
+	if (action === ignoreLabel) {
+		fileState.set(key, { ...state, ignored: true });
+	}
 }
 
 function buildDecisionContext(
@@ -469,6 +575,40 @@ async function convertDocumentEol(document: vscode.TextDocument, target: 'lf' | 
 	return { status: applied ? 'changed' : 'failed' };
 }
 
+function hasFinalNewline(document: vscode.TextDocument): boolean {
+	const text = document.getText();
+	return text.length === 0 || text.endsWith('\n');
+}
+
+function buildFinalNewlineEdits(document: vscode.TextDocument): vscode.TextEdit[] {
+	if (hasFinalNewline(document)) {
+		return [];
+	}
+	const eol = mapEolEnum(document.eol) === 'crlf' ? '\r\n' : '\n';
+	const lastLine = document.lineCount > 0 ? document.lineCount - 1 : 0;
+	const lastLineText = document.lineAt(lastLine).text;
+	const position = new vscode.Position(lastLine, lastLineText.length);
+	return [vscode.TextEdit.insert(position, eol)];
+}
+
+async function ensureFinalNewline(document: vscode.TextDocument): Promise<ConversionResult['status']> {
+	const edits = buildFinalNewlineEdits(document);
+	if (edits.length === 0) {
+		return 'unchanged';
+	}
+	const editor = vscode.window.visibleTextEditors.find((item) => item.document.uri.toString() === document.uri.toString());
+	if (editor) {
+		const success = await editor.edit((edit) => {
+			edit.insert(edits[0].range.start, edits[0].newText);
+		});
+		return success ? 'changed' : 'failed';
+	}
+	const edit = new vscode.WorkspaceEdit();
+	edit.set(document.uri, edits);
+	const applied = await vscode.workspace.applyEdit(edit);
+	return applied ? 'changed' : 'failed';
+}
+
 async function getExpectedEolInfo(document: vscode.TextDocument, config: Config): Promise<ExpectedEolInfo> {
 	let editorconfigValue: 'lf' | 'crlf' | null = null;
 	let sourcePath: string | undefined;
@@ -506,6 +646,7 @@ function getConfig(): Config {
 		mode: config.get<'detectOnly' | 'askBeforeFix' | 'fixOnSave'>('mode', 'detectOnly'),
 		cooldownSeconds: config.get<number>('cooldownSeconds', 60),
 		respectEditorConfig: config.get<boolean>('respectEditorConfig', true),
+		finalNewlineOnly: config.get<boolean>('finalNewlineOnly', false),
 		overrides: sanitizeOverrides(overridesRaw),
 		ignore: sanitizeIgnore(ignoreRaw),
 	};
@@ -623,6 +764,20 @@ async function processWorkspaceFile(uri: vscode.Uri, config: Config): Promise<bo
 	if (!shouldProcessWorkspaceDocument(document, config)) {
 		return false;
 	}
+	if (config.finalNewlineOnly) {
+		const edits = buildFinalNewlineEdits(document);
+		if (edits.length === 0) {
+			return false;
+		}
+		const edit = new vscode.WorkspaceEdit();
+		edit.set(uri, edits);
+		const applied = await vscode.workspace.applyEdit(edit);
+		if (!applied) {
+			return false;
+		}
+		await document.save();
+		return true;
+	}
 	const expectedInfo = await getExpectedEolInfo(document, config);
 	if (expectedInfo.expected === 'auto') {
 		return false;
@@ -725,4 +880,17 @@ async function showConversionMessage(target: 'lf' | 'crlf', status: ConversionRe
 		return;
 	}
 	await vscode.window.showWarningMessage(vscode.l10n.t('EOL update failed.'));
+}
+
+async function showFinalNewlineMessage(status: ConversionResult['status']): Promise<void> {
+	if (status === 'changed') {
+		sessionFixes += 1;
+		await vscode.window.showInformationMessage(vscode.l10n.t('Final newline added.'));
+		return;
+	}
+	if (status === 'unchanged') {
+		await vscode.window.showInformationMessage(vscode.l10n.t('Final newline already present.'));
+		return;
+	}
+	await vscode.window.showWarningMessage(vscode.l10n.t('Final newline update failed.'));
 }
