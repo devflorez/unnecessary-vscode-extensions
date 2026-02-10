@@ -1,0 +1,175 @@
+{
+  "name": "variable-name-therapist",
+  "publisher": "devflorez",
+  "displayName": "Variable Name Therapist",
+  "description": "Kind, humorous feedback for low-quality variable names",
+  "icon": "media/variable-name-therapist-icon.png",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "naming",
+    "variables",
+    "lint",
+    "diagnostics",
+    "productivity"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions"
+  },
+  "bugs": {
+    "url": "https://github.com/devflorez/unnecessary-vscode-extensions/issues"
+  },
+  "homepage": "https://github.com/devflorez/unnecessary-vscode-extensions#readme",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "variable-name-therapist.toggleEnabled",
+        "title": "Variable Name Therapist: Toggle Enabled"
+      },
+      {
+        "command": "variable-name-therapist.analyzeNow",
+        "title": "Variable Name Therapist: Analyze Current File Now"
+      },
+      {
+        "command": "variable-name-therapist.showSummary",
+        "title": "Variable Name Therapist: Show Naming Summary"
+      }
+    ],
+    "configuration": {
+      "title": "Variable Name Therapist",
+      "properties": {
+        "variableNameTherapist.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Variable Name Therapist."
+        },
+        "variableNameTherapist.severity": {
+          "type": "string",
+          "enum": ["warning", "info"],
+          "default": "warning",
+          "description": "Diagnostic severity level."
+        },
+        "variableNameTherapist.debounceMs": {
+          "type": "number",
+          "default": 500,
+          "description": "Debounce time in milliseconds."
+        },
+        "variableNameTherapist.allowSingleLetterInLoops": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow single-letter indices in loops (i/j/k)."
+        },
+        "variableNameTherapist.ignoredPrefixes": {
+          "type": "array",
+          "default": ["_", "$"],
+          "description": "Prefixes to ignore (e.g. _private, $cache).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.ignoredNames": {
+          "type": "array",
+          "default": ["ok", "id"],
+          "description": "Names to ignore.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.allowedLanguages": {
+          "type": "array",
+          "default": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+          "description": "Language IDs to analyze (e.g. python, go).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.enableRegexFallback": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable regex fallback when AST parsing is unavailable."
+        },
+        "variableNameTherapist.useDefaultNameLists": {
+          "type": "boolean",
+          "default": true,
+          "description": "Use the built-in name lists and patterns."
+        },
+        "variableNameTherapist.genericNames": {
+          "type": "array",
+          "default": [],
+          "description": "Extra generic names to flag.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.genericPatterns": {
+          "type": "array",
+          "default": [],
+          "description": "Extra regex patterns for generic names (e.g. \"^data_.*$\").",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.keyboardMashNames": {
+          "type": "array",
+          "default": [],
+          "description": "Extra keyboard-mash names to flag.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.versionedPatterns": {
+          "type": "array",
+          "default": [],
+          "description": "Extra regex patterns for versioned names (e.g. \"^legacy_.*$\").",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variableNameTherapist.locale": {
+          "type": "string",
+          "enum": ["auto", "en", "es"],
+          "default": "auto",
+          "description": "Language for messages."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "node ./node_modules/@vscode/test-cli/out/bin.mjs"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.103.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.54.0",
+    "eslint": "^9.39.2",
+    "esbuild": "^0.27.2",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

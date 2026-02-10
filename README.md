@@ -17,6 +17,8 @@ This repository is built in public to:
 | Commit Mood Translator | Translate commit messages into expressive moods | ✅ Ready |
 | EOL Guardian | Detect and fix line endings (LF/CRLF) safely | ✅ Ready |
 | Cinematic Errors | Turn errors into movie-trailer style messages | ✅ Ready |
+| Variable Name Therapist | Gentle coaching for clearer, kinder variable names | ✅ Ready |
+| Variable Name Therapist | Friendly diagnostics for vague variable names | ✅ Ready |
 
 ## Structure
 ```text
@@ -26,6 +28,8 @@ extensions/
   ├── commit-mood-translator/
   ├── eol-guardian/
   ├── cinematic-errors/
+  ├── variable-name-therapist/
+  ├── variable-name-therapist/
 ```
 
 ## Publishing
@@ -39,6 +43,8 @@ Steps:
    - Commit Mood Translator: `git tag commit-mood-translator/v1.0.0` then `git push origin commit-mood-translator/v1.0.0`
    - EOL Guardian: `git tag eol-guardian/v1.0.0` then `git push origin eol-guardian/v1.0.0`
    - Cinematic Errors: `git tag cinematic-errors/v1.0.0` then `git push origin cinematic-errors/v1.0.0`
+   - Variable Name Therapist: `git tag variable-name-therapist/v1.0.0` then `git push origin variable-name-therapist/v1.0.0`
+   - Variable Name Therapist: `git tag variable-name-therapist/v1.0.0` then `git push origin variable-name-therapist/v1.0.0`
 3. The GitHub Actions workflow publishes via `vsce publish`.
 
 Local dry run (Self Esteem Linter):
@@ -68,5 +74,17 @@ npx @vscode/vsce package
 Local dry run (Cinematic Errors):
 ```bash
 cd unnecessary-vscode-extensions/extensions/cinematic-errors
+npx @vscode/vsce package
+```
+
+Local dry run (Variable Name Therapist):
+```bash
+cd unnecessary-vscode-extensions/extensions/variable-name-therapist
+npx @vscode/vsce package
+```
+
+Local dry run (Variable Name Therapist):
+```bash
+cd unnecessary-vscode-extensions/extensions/variable-name-therapist
 npx @vscode/vsce package
 ```

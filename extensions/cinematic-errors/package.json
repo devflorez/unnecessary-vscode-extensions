@@ -29,10 +29,7 @@
   },
   "homepage": "https://github.com/devflorez/unnecessary-vscode-extensions#readme",
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:cinematic-errors.toggleEnabled",
-    "onCommand:cinematic-errors.showLastTrailer",
-    "onCommand:cinematic-errors.resetCooldown"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -55,6 +52,7 @@
     "views": {
       "cinematicErrors": [
         {
+          "icon": "media/cinematic-errors-icon.png",
           "id": "cinematicErrors.trailerView",
           "name": "%views.trailer.name%",
           "type": "webview"
@@ -62,6 +60,7 @@
       ],
       "cinematicErrorsPanel": [
         {
+          "icon": "media/cinematic-errors-icon.png",
           "id": "cinematicErrors.panelView",
           "name": "%views.panel.trailer.name%",
           "type": "webview"
