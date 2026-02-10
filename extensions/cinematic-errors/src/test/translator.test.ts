@@ -39,7 +39,7 @@ suite('Cinematic Errors Translator', () => {
 	});
 
 	test('falls back to generic message', () => {
-		const message = matchCinematicMessage('Unexpected token', 'en');
+		const message = matchCinematicMessage('Something went wrong', 'en');
 		assert.strictEqual(message.id, 'fallback');
 	});
 
